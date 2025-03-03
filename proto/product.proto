@@ -1,0 +1,4 @@
+syntax="proto3";
+package product;
+option go_package= "github.com/meles-z/go-grpc-microsevice/pb";
+
