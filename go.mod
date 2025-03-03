@@ -8,14 +8,14 @@ require (
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/spf13/viper v1.19.0
 	google.golang.org/grpc v1.62.1
-	google.golang.org/protobuf v1.36.5
+	google.golang.org/protobuf v1.33.0
 	gorm.io/driver/postgres v1.5.11
 	gorm.io/gorm v1.25.12
 )
 
 require (
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
-	github.com/golang/protobuf v1.5.4 // indirect
+	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
