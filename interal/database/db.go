@@ -12,7 +12,7 @@ import (
 var DB *gorm.DB
 
 func InitDB(cfg *config.DatabaseConfig) (*gorm.DB, error) {
-	dsn := fmt.Sprintf("host=%s port=%d name=%s user=%s password=%s sslmode=disabled",
+	dsn := fmt.Sprintf("host=%s port=%d dbname=%s user=%s password=%s sslmode=disable",
 		cfg.Host, cfg.Port, cfg.Name, cfg.Username, cfg.Password)
 	orderDb, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -21,9 +21,10 @@ func InitDB(cfg *config.DatabaseConfig) (*gorm.DB, error) {
 	DB = orderDb
 	orderDb.AutoMigrate(
 		&entities.User{},
-		&entities.OrderItem{},
 		&entities.Product{},
+		&entities.OrderItem{},
 		&entities.Order{},
 	)
+	fmt.Println("Databas connected successfully!")
 	return orderDb, nil
 }

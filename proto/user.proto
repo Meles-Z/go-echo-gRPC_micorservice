@@ -1,0 +1,12 @@
+syntax="proto3";
+package user;
+option go_package="github.com/meles-z/go-grpc-microsevice/user";
+
+message User{
+    string name=1;
+    string email =2;
+    string address=3;
+    string phone=4;
+    string password=5;
+    repeated string order_ids = 7; 
+}

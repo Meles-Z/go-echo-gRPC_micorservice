@@ -1,9 +1,9 @@
 package entities
 
 type OrderItem struct {
-	ID         uint    `gorm:"primaryKey"`
-	OrderID    uint    `gorm:"not null"` // Foreign key to Order
-	ProductID  uint    `gorm:"not null"` // Foreign key to Product
+	Model
+	OrderID    string  `gorm:"not null"` // Foreign key to Order
+	ProductID  string  `gorm:"not null"` // Foreign key to Product
 	Quantity   int     `json:"quantity"`
 	UnitPrice  float64 `json:"unit_price"`
 	TotalPrice float64 `json:"total_price"`          // Quantity * UnitPrice

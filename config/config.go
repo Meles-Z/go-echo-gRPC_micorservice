@@ -26,39 +26,42 @@ type AuthConfig struct {
 }
 
 func LoadConfig() (*Config, error) {
-	var cfg Config
+	var config Config
 	var err error
-
 	viper.AddConfigPath("./")
 	viper.SetConfigName(".")
-	viper.SetConfigType(".env")
+	viper.SetConfigType("env")
 	viper.AutomaticEnv()
 
-	if err = viper.BindEnv("server_host", "SERVER_HOST"); err != nil {
+	if err = viper.BindEnv("server.host", "SERVER_HOST"); err != nil {
 		return nil, err
 	}
-	if err = viper.BindEnv("server_port", "SERVER_PORT"); err != nil {
+	if err = viper.BindEnv("server.port", "SERVER_PORT"); err != nil {
 		return nil, err
 	}
-	if err = viper.BindEnv("db_host", "DB_HOST"); err != nil {
-		return nil, err
-	}
-	if err = viper.BindEnv("db_port", "DB_PORT"); err != nil {
-		return nil, err
-	}
-	if err = viper.BindEnv("db_name", "DB_NAME"); err != nil {
-		return nil, err
-	}
-	if err = viper.BindEnv("db_username", "DB_USERNAME"); err != nil {
-		return nil, err
-	}
-	if err = viper.BindEnv("db_password", "DB_PASSWORD"); err != nil {
+	if err = viper.BindEnv("db.name", "DB_NAME"); err != nil {
 		return nil, err
 	}
 
-	err = viper.Unmarshal(&cfg)
+	if err = viper.BindEnv("db.host", "DB_HOST"); err != nil {
+		return nil, err
+	}
+	if err = viper.BindEnv("db.port", "DB_PORT"); err != nil {
+		return nil, err
+	}
+
+	if err = viper.BindEnv("db.username", "DB_USERNAME"); err != nil {
+		return nil, err
+	}
+	if err = viper.BindEnv("db.password", "DB_PASSWORD"); err != nil {
+		return nil, err
+	}
+	// if err := viper.ReadInConfig(); err != nil {
+	// 	return nil, fmt.Errorf("error reading config file: %w", err)
+	// }
+	err = viper.Unmarshal(&config)
 	if err != nil {
 		return nil, err
 	}
-	return &cfg, nil
+	return &config, nil
 }

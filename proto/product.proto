@@ -1,4 +1,50 @@
 syntax="proto3";
 package product;
-option go_package= "github.com/meles-z/go-grpc-microsevice/pb";
+option go_package= "github.com/meles-z/go-grpc-microsevice/product";
 
+message Product{
+    string name =1;
+    string description=2;
+    double price=3;
+    int32 stock_quantity=4;
+
+}
+
+message CreateProductRequest{
+    Product product=1;
+}
+message CreateProductResponse{
+    Product product=1;
+}
+message GetAllProductsRequest{
+
+}
+message GetAllProductsResponse{
+    repeated Product product=1;
+}
+message GetProductByIdRequest{
+    string id=1;
+}
+message GetProductByIdResponse{
+    Product product=1;
+}
+message UpdateProductRequest{
+    Product product=1;
+}
+message UpdateProductResponse{
+    Product product =1;
+}
+message DeleteProductRequest{
+    string id =1;
+}
+message DeleteProductResponse{
+    bool success=1;
+}
+
+service ProductService{
+    rpc CreateProduct(CreateProductRequest) returns (CreateProductResponse);
+    rpc GetAllProducts(GetAllProductsRequest) returns (GetAllProductsResponse);
+    rpc GetProductById(GetProductByIdRequest) returns (GetProductByIdResponse);
+    rpc UpdateProduct(UpdateProductRequest) returns( UpdateProductResponse);
+    rpc DeleteProduct(DeleteProductRequest) returns (DeleteProductResponse);
+}
