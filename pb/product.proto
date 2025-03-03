@@ -1,6 +1,6 @@
 syntax="proto3";
-package product;
-option go_package= "github.com/meles-z/go-grpc-microsevice/product";
+package order;
+option go_package= "github.com/meles-z/go-grpc-microsevice/order";
 
 message Product{
     string name =1;

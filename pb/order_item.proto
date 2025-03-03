@@ -1,6 +1,6 @@
 syntax="proto3";
-package order_item;
-option go_package="github.com/meles-z/go-grpc-microsevice/order_item";
+package order;
+option go_package="github.com/meles-z/go-grpc-microsevice/order";
 
 message OrderItem{
     string OrderId =1;
