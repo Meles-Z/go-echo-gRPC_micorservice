@@ -4,27 +4,27 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
-	"github.com/meles-z/go-grpc-microsevice/config"
-	"github.com/meles-z/go-grpc-microsevice/interal/database"
+	"github.com/meles-z/go-grpc-microsevice/interal"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("error to load env file:", err)
-	}
-	config, err := config.LoadConfig()
-	if err != nil {
-		log.Fatalln("Error to load config file:", err)
-	}
-	db, err := database.InitDB(&config.DB)
-	if err != nil {
-		log.Fatalln("Error to initateDb:", err)
-	}
-	fmt.Print("db:", db)
+	e := echo.New()
 
-	ech := echo.New()
-	log.Fatal(ech.Start(fmt.Sprintf(":%d", config.Server.Port)))
+	// Create gRPC connection
+	conn, err := grpc.Dial("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Could not connect to gRPC server: %v", err)
+	}
+	defer conn.Close()
+
+	// Pass gRPC client connection to Routes
+	interal.Routes(e, conn)
+
+	// Start HTTP server
+	port := 8080
+	fmt.Printf("Server running on port %d\n", port)
+	log.Fatal(e.Start(fmt.Sprintf(":%d", port)))
 }
