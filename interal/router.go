@@ -2,7 +2,7 @@ package interal
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/meles-z/go-grpc-microsevice/interal/handlers"
+	handlers "github.com/meles-z/go-grpc-microsevice/interal/handlers/user"
 	order "github.com/meles-z/go-grpc-microsevice/pkg/pb"
 	"google.golang.org/grpc"
 )
@@ -10,5 +10,7 @@ import (
 // Routes registers all routes with the Echo server
 func Routes(e *echo.Echo, grpcConn *grpc.ClientConn) {
 	client := order.NewUserServiceClient(grpcConn)
-	e.POST("/users", handlers.CreateUser(client))
+	user := e.Group("/user")
+	user.POST("/create", handlers.CreateUser(client))
+	user.GET("/all", handlers.GetAllUser(client))
 }

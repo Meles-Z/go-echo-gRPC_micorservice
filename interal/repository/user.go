@@ -15,6 +15,7 @@ type Server struct {
 }
 type UserRepository interface {
 	CreateUser(ctx context.Context, req *order.CreateUserRequest) (*order.CreateUserResponse, error)
+	GetAllUsers(ctx context.Context, req *order.GetAllUsersRequest) (*order.GetAllUsersResponse, error)
 }
 
 func NewUserRepository(db *gorm.DB) UserRepository {
@@ -44,5 +45,29 @@ func (s *Server) CreateUser(ctx context.Context, req *order.CreateUserRequest) (
 			Phone:    user.Phone,
 			Password: user.Password,
 		},
+	}, nil
+}
+
+// Implement the GetAllUsers method
+func (s *Server) GetAllUsers(ctx context.Context, req *order.GetAllUsersRequest) (*order.GetAllUsersResponse, error) {
+
+	var dbUsers []entities.User
+	if err := s.DB.Find(&dbUsers).Error; err != nil {
+		return nil, errors.New("failed to return all users: " + err.Error())
+	}
+
+	// Convert database users to gRPC users
+	var grpcUsers []*order.User
+	for _, user := range dbUsers {
+		grpcUsers = append(grpcUsers, &order.User{
+			Name:    user.Name,
+			Email:   user.Email,
+			Address: user.Address,
+			Phone:   user.Phone,
+		})
+	}
+
+	return &order.GetAllUsersResponse{
+		Users: grpcUsers,
 	}, nil
 }

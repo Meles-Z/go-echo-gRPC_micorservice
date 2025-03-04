@@ -10,6 +10,7 @@ import (
 
 type IUserService interface {
 	CreateUser(ctx context.Context, req *order.CreateUserRequest) (*order.CreateUserResponse, error)
+	GetAllUser(ctx context.Context, req *order.GetAllUsersRequest) (*order.GetAllUsersResponse, error)
 }
 
 type UserService struct {
@@ -29,4 +30,12 @@ func (srv *UserService) CreateUser(ctx context.Context, req *order.CreateUserReq
 		return nil, errors.New("failed to create user: " + err.Error())
 	}
 	return user, nil
+}
+
+func (srv *UserService) GetAllUser(ctx context.Context, req *order.GetAllUsersRequest) (*order.GetAllUsersResponse, error) {
+	users, err := srv.userRepo.GetAllUsers(ctx, req)
+	if err != nil {
+		return nil, errors.New("failed to feach all users: " + err.Error())
+	}
+	return users, nil
 }

@@ -19,18 +19,19 @@ func CreateUser(client order.UserServiceClient) echo.HandlerFunc {
 		}
 
 		// Prepare gRPC request
-		req := &order.CreateUserRequest{
-			User: &order.User{
-				Name:     user.Name,
-				Email:    user.Email,
-				Address:  user.Address,
-				Phone:    user.Phone,
-				Password: user.Password,
-			},
+
+		newUser := &order.User{
+			Name:     user.Name,
+			Email:    user.Email,
+			Address:  user.Address,
+			Phone:    user.Phone,
+			Password: user.Password,
 		}
 
 		// Call gRPC server
-		res, err := client.CreateUser(context.Background(), req)
+		res, err := client.CreateUser(context.Background(), &order.CreateUserRequest{
+			User: newUser,
+		})
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, fmt.Sprintf("error creating user: %v", err))
 		}
@@ -41,4 +42,3 @@ func CreateUser(client order.UserServiceClient) echo.HandlerFunc {
 		})
 	}
 }
-
