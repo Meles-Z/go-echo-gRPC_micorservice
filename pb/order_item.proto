@@ -1,13 +1,18 @@
 syntax="proto3";
 package order;
 option go_package="github.com/meles-z/go-grpc-microsevice/order";
+import "google/protobuf/timestamp.proto";
 
 message OrderItem{
-    string OrderId =1;
-    string ProductId =2;
-    int32 Quantity =3;
-    double UnitPrice =4;
-    double TotalPrice =5;
+    string id =1;
+    string OrderId =2;
+    string ProductId =3;
+    int32 Quantity =4;
+    double UnitPrice =5;
+    double TotalPrice =6;
+    google.protobuf.Timestamp created_at=7;
+    google.protobuf.Timestamp updated_at=8;
+    optional google.protobuf.Timestamp deleted_at=9;
 }
 
 message CreateOrderItemRequest{
@@ -47,7 +52,7 @@ message DeleteOrderItemResponse{
 
 service OrderItemService{
     rpc CreateOrderItem (CreateOrderItemRequest) returns (CreateOrderItemResponse);
-    rpc Request (GetAllOrderItemsRequest) returns (GetAllOrderItemsResponse);
+    rpc GetAllOrdersItem (GetAllOrderItemsRequest) returns (stream OrderItem);
     rpc GetOrderItemsById (GetOrderItemsByIdRequest) returns (GetOrderItemByIdResponse);
     rpc UpdateOrderItem (UpdateOrderItemRequest) returns (UpdateOrderItemResponse);
     rpc DeleteOrderItem (DeleteOrderItemRequest) returns (DeleteOrderItemResponse);

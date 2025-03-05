@@ -16,11 +16,11 @@ import (
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
 // Requires gRPC-Go v1.64.0 or later.
-const _ = grpc.SupportPackageIsVersion7
+const _ = grpc.SupportPackageIsVersion9
 
 const (
 	OrderItemService_CreateOrderItem_FullMethodName   = "/order.OrderItemService/CreateOrderItem"
-	OrderItemService_Request_FullMethodName           = "/order.OrderItemService/Request"
+	OrderItemService_GetAllOrdersItem_FullMethodName  = "/order.OrderItemService/GetAllOrdersItem"
 	OrderItemService_GetOrderItemsById_FullMethodName = "/order.OrderItemService/GetOrderItemsById"
 	OrderItemService_UpdateOrderItem_FullMethodName   = "/order.OrderItemService/UpdateOrderItem"
 	OrderItemService_DeleteOrderItem_FullMethodName   = "/order.OrderItemService/DeleteOrderItem"
@@ -31,7 +31,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OrderItemServiceClient interface {
 	CreateOrderItem(ctx context.Context, in *CreateOrderItemRequest, opts ...grpc.CallOption) (*CreateOrderItemResponse, error)
-	Request(ctx context.Context, in *GetAllOrderItemsRequest, opts ...grpc.CallOption) (*GetAllOrderItemsResponse, error)
+	GetAllOrdersItem(ctx context.Context, in *GetAllOrderItemsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[OrderItem], error)
 	GetOrderItemsById(ctx context.Context, in *GetOrderItemsByIdRequest, opts ...grpc.CallOption) (*GetOrderItemByIdResponse, error)
 	UpdateOrderItem(ctx context.Context, in *UpdateOrderItemRequest, opts ...grpc.CallOption) (*UpdateOrderItemResponse, error)
 	DeleteOrderItem(ctx context.Context, in *DeleteOrderItemRequest, opts ...grpc.CallOption) (*DeleteOrderItemResponse, error)
@@ -55,15 +55,24 @@ func (c *orderItemServiceClient) CreateOrderItem(ctx context.Context, in *Create
 	return out, nil
 }
 
-func (c *orderItemServiceClient) Request(ctx context.Context, in *GetAllOrderItemsRequest, opts ...grpc.CallOption) (*GetAllOrderItemsResponse, error) {
+func (c *orderItemServiceClient) GetAllOrdersItem(ctx context.Context, in *GetAllOrderItemsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[OrderItem], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetAllOrderItemsResponse)
-	err := c.cc.Invoke(ctx, OrderItemService_Request_FullMethodName, in, out, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &OrderItemService_ServiceDesc.Streams[0], OrderItemService_GetAllOrdersItem_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &grpc.GenericClientStream[GetAllOrderItemsRequest, OrderItem]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
 }
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type OrderItemService_GetAllOrdersItemClient = grpc.ServerStreamingClient[OrderItem]
 
 func (c *orderItemServiceClient) GetOrderItemsById(ctx context.Context, in *GetOrderItemsByIdRequest, opts ...grpc.CallOption) (*GetOrderItemByIdResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
@@ -100,7 +109,7 @@ func (c *orderItemServiceClient) DeleteOrderItem(ctx context.Context, in *Delete
 // for forward compatibility.
 type OrderItemServiceServer interface {
 	CreateOrderItem(context.Context, *CreateOrderItemRequest) (*CreateOrderItemResponse, error)
-	Request(context.Context, *GetAllOrderItemsRequest) (*GetAllOrderItemsResponse, error)
+	GetAllOrdersItem(*GetAllOrderItemsRequest, grpc.ServerStreamingServer[OrderItem]) error
 	GetOrderItemsById(context.Context, *GetOrderItemsByIdRequest) (*GetOrderItemByIdResponse, error)
 	UpdateOrderItem(context.Context, *UpdateOrderItemRequest) (*UpdateOrderItemResponse, error)
 	DeleteOrderItem(context.Context, *DeleteOrderItemRequest) (*DeleteOrderItemResponse, error)
@@ -117,8 +126,8 @@ type UnimplementedOrderItemServiceServer struct{}
 func (UnimplementedOrderItemServiceServer) CreateOrderItem(context.Context, *CreateOrderItemRequest) (*CreateOrderItemResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateOrderItem not implemented")
 }
-func (UnimplementedOrderItemServiceServer) Request(context.Context, *GetAllOrderItemsRequest) (*GetAllOrderItemsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Request not implemented")
+func (UnimplementedOrderItemServiceServer) GetAllOrdersItem(*GetAllOrderItemsRequest, grpc.ServerStreamingServer[OrderItem]) error {
+	return status.Errorf(codes.Unimplemented, "method GetAllOrdersItem not implemented")
 }
 func (UnimplementedOrderItemServiceServer) GetOrderItemsById(context.Context, *GetOrderItemsByIdRequest) (*GetOrderItemByIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOrderItemsById not implemented")
@@ -168,23 +177,16 @@ func _OrderItemService_CreateOrderItem_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
-func _OrderItemService_Request_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetAllOrderItemsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
+func _OrderItemService_GetAllOrdersItem_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GetAllOrderItemsRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	if interceptor == nil {
-		return srv.(OrderItemServiceServer).Request(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: OrderItemService_Request_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrderItemServiceServer).Request(ctx, req.(*GetAllOrderItemsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	return srv.(OrderItemServiceServer).GetAllOrdersItem(m, &grpc.GenericServerStream[GetAllOrderItemsRequest, OrderItem]{ServerStream: stream})
 }
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type OrderItemService_GetAllOrdersItemServer = grpc.ServerStreamingServer[OrderItem]
 
 func _OrderItemService_GetOrderItemsById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetOrderItemsByIdRequest)
@@ -252,10 +254,6 @@ var OrderItemService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _OrderItemService_CreateOrderItem_Handler,
 		},
 		{
-			MethodName: "Request",
-			Handler:    _OrderItemService_Request_Handler,
-		},
-		{
 			MethodName: "GetOrderItemsById",
 			Handler:    _OrderItemService_GetOrderItemsById_Handler,
 		},
@@ -268,6 +266,12 @@ var OrderItemService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _OrderItemService_DeleteOrderItem_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "GetAllOrdersItem",
+			Handler:       _OrderItemService_GetAllOrdersItem_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "pb/order_item.proto",
 }
