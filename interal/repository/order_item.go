@@ -11,7 +11,7 @@ import (
 
 type OrderItemRepository interface {
 	CreateOrderItem(ctx context.Context, req *order.CreateOrderItemRequest) (*order.CreateOrderItemResponse, error)
-	GetAllOrdersItem(ctx context.Context, req *order.GetAllOrderItemsRequest, stream order.OrderItemService_GetAllOrdersItemServer) error
+	GetAllOrdersItem(req *order.GetAllOrderItemsRequest, stream order.OrderItemService_GetAllOrdersItemServer) error
 }
 
 type OrderItemImp struct {
@@ -50,7 +50,7 @@ func (s *OrderItemImp) CreateOrderItem(ctx context.Context, req *order.CreateOrd
 	}, nil
 }
 
-func (s *OrderItemImp) GetAllOrdersItem(ctx context.Context, req *order.GetAllOrderItemsRequest, stream order.OrderItemService_GetAllOrdersItemServer) error {
+func (s *OrderItemImp) GetAllOrdersItem(req *order.GetAllOrderItemsRequest, stream order.OrderItemService_GetAllOrdersItemServer) error {
 	var dbUser []entities.OrderItem
 	if err := s.DB.Find(&dbUser).Error; err != nil {
 		return errors.New("failed to return all items:" + err.Error())

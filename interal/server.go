@@ -58,6 +58,10 @@ func (s *Server) Start() error {
 		DB:                             s.DB,
 		UnimplementedUserServiceServer: &order.UnimplementedUserServiceServer{},
 	})
+	order.RegisterProductServiceServer(grpcServer, &repository.ProductRepoImp{
+		DB:                                s.DB,
+		UnimplementedProductServiceServer: &order.UnimplementedProductServiceServer{},
+	})
 
 	log.Printf("Server listening at %v", lis.Addr())
 

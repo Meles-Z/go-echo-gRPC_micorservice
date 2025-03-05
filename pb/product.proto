@@ -3,11 +3,11 @@ package order;
 option go_package= "github.com/meles-z/go-grpc-microsevice/order";
 
 message Product{
-    string name =1;
-    string description=2;
-    double price=3;
-    int32 stock_quantity=4;
-
+    string id=1;
+    string name =2;
+    string description=3;
+    double price=4;
+    int64 stock_quantity=5;
 }
 
 message CreateProductRequest{
