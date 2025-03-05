@@ -12,5 +12,6 @@ func Routes(e *echo.Echo, grpcConn *grpc.ClientConn) {
 	client := order.NewUserServiceClient(grpcConn)
 	user := e.Group("/user")
 	user.POST("/create", handlers.CreateUser(client))
-	user.GET("/all", handlers.GetAllUser(client))
+	user.GET("/all", handlers.GetAllUsers(client))
+	user.GET("/get-user/:id", handlers.GetUserById(client))
 }

@@ -10,7 +10,8 @@ import (
 
 type IUserService interface {
 	CreateUser(ctx context.Context, req *order.CreateUserRequest) (*order.CreateUserResponse, error)
-	GetAllUser(ctx context.Context, req *order.GetAllUsersRequest) (*order.GetAllUsersResponse, error)
+	GetAllUsers(ctx context.Context, req *order.GetAllUsersRequest) (*order.GetAllUsersResponse, error)
+	GetUserById(ctx context.Context, req *order.GetUserByIdRequest) (*order.GetUserByIdResponse, error)
 }
 
 type UserService struct {
@@ -32,10 +33,18 @@ func (srv *UserService) CreateUser(ctx context.Context, req *order.CreateUserReq
 	return user, nil
 }
 
-func (srv *UserService) GetAllUser(ctx context.Context, req *order.GetAllUsersRequest) (*order.GetAllUsersResponse, error) {
+func (srv *UserService) GetAllUsers(ctx context.Context, req *order.GetAllUsersRequest) (*order.GetAllUsersResponse, error) {
 	users, err := srv.userRepo.GetAllUsers(ctx, req)
 	if err != nil {
 		return nil, errors.New("failed to feach all users: " + err.Error())
 	}
 	return users, nil
+}
+
+func (srv *UserService) GetUserById(ctx context.Context, req *order.GetUserByIdRequest) (*order.GetUserByIdResponse, error) {
+	user, err := srv.userRepo.GetUserById(ctx, req)
+	if err != nil {
+		return nil, errors.New("failed to feach users by id: " + err.Error())
+	}
+	return user, nil
 }

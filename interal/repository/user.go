@@ -16,6 +16,7 @@ type Server struct {
 type UserRepository interface {
 	CreateUser(ctx context.Context, req *order.CreateUserRequest) (*order.CreateUserResponse, error)
 	GetAllUsers(ctx context.Context, req *order.GetAllUsersRequest) (*order.GetAllUsersResponse, error)
+	GetUserById(ctx context.Context, req *order.GetUserByIdRequest) (*order.GetUserByIdResponse, error)
 }
 
 func NewUserRepository(db *gorm.DB) UserRepository {
@@ -69,5 +70,20 @@ func (s *Server) GetAllUsers(ctx context.Context, req *order.GetAllUsersRequest)
 
 	return &order.GetAllUsersResponse{
 		Users: grpcUsers,
+	}, nil
+}
+
+func (s *Server) GetUserById(ctx context.Context, req *order.GetUserByIdRequest) (*order.GetUserByIdResponse, error) {
+	var user entities.User
+	if err := s.DB.Where("id=?", req.GetId()).Take(&user).Error; err != nil {
+		return nil, errors.New("User not found: " + err.Error())
+	}
+	return &order.GetUserByIdResponse{
+		User: &order.User{
+			Name:    user.Name,
+			Email:   user.Email,
+			Address: user.Address,
+			Phone:   user.Phone,
+		},
 	}, nil
 }

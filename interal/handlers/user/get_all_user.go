@@ -9,7 +9,7 @@ import (
 	order "github.com/meles-z/go-grpc-microsevice/pkg/pb"
 )
 
-func GetAllUser(client order.UserServiceClient) echo.HandlerFunc {
+func GetAllUsers(client order.UserServiceClient) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		// Call gRPC service
 		res, err := client.GetAllUsers(context.Background(), &order.GetAllUsersRequest{})
