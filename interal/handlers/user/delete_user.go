@@ -14,13 +14,12 @@ func DeleteUser(client order.UserServiceClient) echo.HandlerFunc {
 		deletedUser, err := client.DeleteUser(context.Background(), &order.DeleteUserRequest{
 			Id: id,
 		})
-
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]string{
-				"error:": err.Error(),
+				"error": err.Error(),
 			})
 		}
-		resp := map[string]interface{}{
+		resp := map[string]any{
 			"success": deletedUser.Success,
 		}
 		return c.JSON(http.StatusOK, resp)

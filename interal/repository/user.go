@@ -119,10 +119,19 @@ func (s *Server) UpdateUser(ctx context.Context, req *order.UpdateUserRequest) (
 
 func (s *Server) DeleteUser(ctx context.Context, req *order.DeleteUserRequest) (*order.DeleteUserResponse, error) {
 	var user entities.User
-	err := s.DB.Where("id=?", req.GetId()).Delete(&user).Error
-	if err != nil {
-		return nil, errors.New("Error to delete user:" + err.Error())
+	result := s.DB.Where("id=?", req.GetId()).Delete(&user) // Get the result
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) { // Check for "record not found"
+			return nil, errors.New("user not found")
+		}
+		return nil, errors.New("Error to delete user: " + result.Error.Error())
 	}
+
+	if result.RowsAffected == 0 { // Check if any rows were affected
+		return nil, errors.New("user not found")
+	}
+
 	return &order.DeleteUserResponse{
 		Success: true,
 	}, nil

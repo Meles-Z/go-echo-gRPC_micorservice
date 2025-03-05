@@ -9,7 +9,6 @@ import (
 	"github.com/meles-z/go-grpc-microsevice/config"
 	"github.com/meles-z/go-grpc-microsevice/interal/database"
 	"github.com/meles-z/go-grpc-microsevice/interal/repository"
-	"github.com/meles-z/go-grpc-microsevice/interal/service"
 	order "github.com/meles-z/go-grpc-microsevice/pkg/pb"
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
@@ -26,7 +25,7 @@ type IServer interface {
 type Server struct {
 	DB     *gorm.DB
 	config config.Config
-	user   service.IUserService
+	// user   service.IUserService
 }
 
 func NewServer(cfg config.Config) IServer {
@@ -35,19 +34,10 @@ func NewServer(cfg config.Config) IServer {
 	if err != nil {
 		log.Fatalf("DB INITIALIZE ERROR :%s", err.Error())
 	}
-
-	// Initialize user repository and service
-	userRepository := repository.NewUserRepository(mainDb)
-	userSvc, err := service.NewUserService(userRepository)
-	if err != nil {
-		log.Fatal("Error to initialize user service:", err)
-	}
-
 	// Return the server instance
 	return &Server{
 		DB:     mainDb,
 		config: cfg,
-		user:   userSvc,
 	}
 }
 
@@ -65,7 +55,7 @@ func (s *Server) Start() error {
 
 	// Register the user service with the gRPC server
 	order.RegisterUserServiceServer(grpcServer, &repository.Server{
-		DB: s.DB,
+		DB:                             s.DB,
 		UnimplementedUserServiceServer: &order.UnimplementedUserServiceServer{},
 	})
 
