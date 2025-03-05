@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/meles-z/go-grpc-microsevice/interal/entities"
 	order "github.com/meles-z/go-grpc-microsevice/pkg/pb"
@@ -17,6 +18,8 @@ type UserRepository interface {
 	CreateUser(ctx context.Context, req *order.CreateUserRequest) (*order.CreateUserResponse, error)
 	GetAllUsers(ctx context.Context, req *order.GetAllUsersRequest) (*order.GetAllUsersResponse, error)
 	GetUserById(ctx context.Context, req *order.GetUserByIdRequest) (*order.GetUserByIdResponse, error)
+	UpdateUser(cxt context.Context, req *order.UpdateUserRequest) (*order.UpdateUserResponse, error)
+	DeleteUser(ctx context.Context, req *order.DeleteUserRequest) (*order.DeleteUserResponse, error)
 }
 
 func NewUserRepository(db *gorm.DB) UserRepository {
@@ -85,5 +88,42 @@ func (s *Server) GetUserById(ctx context.Context, req *order.GetUserByIdRequest)
 			Address: user.Address,
 			Phone:   user.Phone,
 		},
+	}, nil
+}
+
+func (s *Server) UpdateUser(ctx context.Context, req *order.UpdateUserRequest) (*order.UpdateUserResponse, error) {
+	var existingUser entities.User
+	reqUser := req.GetUser()
+	fmt.Println("User id response:", reqUser.Id)
+	err := s.DB.Model(&existingUser).Where("id=?", reqUser.Id).Updates(entities.User{
+		Name:     reqUser.Name,
+		Email:    reqUser.Email,
+		Address:  reqUser.Address,
+		Phone:    reqUser.Phone,
+		Password: reqUser.Password,
+	}).Scan(&existingUser).Error
+	if err != nil {
+		return nil, errors.New("failed to update users:" + err.Error())
+	}
+	return &order.UpdateUserResponse{
+		User: &order.User{
+			Id:       existingUser.ID,
+			Name:     existingUser.Name,
+			Email:    existingUser.Email,
+			Address:  existingUser.Address,
+			Phone:    existingUser.Phone,
+			Password: existingUser.Password,
+		},
+	}, nil
+}
+
+func (s *Server) DeleteUser(ctx context.Context, req *order.DeleteUserRequest) (*order.DeleteUserResponse, error) {
+	var user entities.User
+	err := s.DB.Where("id=?", req.GetId()).Delete(&user).Error
+	if err != nil {
+		return nil, errors.New("Error to delete user:" + err.Error())
+	}
+	return &order.DeleteUserResponse{
+		Success: true,
 	}, nil
 }
